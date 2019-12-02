@@ -10,7 +10,7 @@ Debugging tool for Computer Science exercises on concurrent process synchronizat
 
 ### Requirements
 
-* Lua 5.3
+* [Lua 5.3](https://en.wikipedia.org/wiki/Lua_(programming_language))
 * ANSI escapes-compatible terminal:
   * Linux: any terminal
   * Windows: [ANSICON](https://github.com/adoxa/ansicon) or [ConEmu](https://conemu.github.io/)
@@ -56,9 +56,10 @@ arrayName = new {length, initialValue}
 -- ...
 
 --[[
-This is a process, currently there's no way to control how or when it's started:
-  the script just spawns randomly new instances of this.
-There is a limit of maximum 8 processes existing simultaneously
+This is a process.
+Currently there's no way to control how or when they are started:
+  the script spawns new instances using RoundRobin algorithm.
+There is a limit of maximum (#processes * 3) instances existing simultaneously.
 ]]
 function processName(pid)
   --These are the basic semaphore functions P (or "wait")
@@ -79,9 +80,6 @@ function processName(pid)
   local var1, var2 = value1, value2
   --global variable, exposed to everything
   newVar = value
-  --you can find more here:
-  --  https://en.wikipedia.org/wiki/Lua_(programming_language)
-  --  https://www.lua.org/manual/5.3/contents.html#contents
 end
 
 function processName2(pid)
