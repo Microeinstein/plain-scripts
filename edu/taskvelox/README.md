@@ -10,24 +10,39 @@ Debugging tool for Computer Science exercises on concurrent process synchronizat
 
 ### Requirements
 
-* [Lua 5.3](https://en.wikipedia.org/wiki/Lua_(programming_language))
+* [Lua 5.3](https://en.wikipedia.org/wiki/Lua_(programming_language)):
+  * ArchLinux: `pacman -S lua`
+  * Ubuntu: `apt install lua5.3`
+  * Windows: [choose a binary here](http://luabinaries.sourceforge.net/download.html)
 * ANSI escapes-compatible terminal:
   * Linux: any terminal
   * Windows: [ANSICON](https://github.com/adoxa/ansicon) or [ConEmu](https://conemu.github.io/)
 
 ### Usage
 
-Launch `taskvelox.lua` with an exercise, or let the script show you the choices:
+1. Launch `taskvelox.lua` with an exercise, or let the script show you the choices:
 
-    ./taskvelox.lua [exerciseName_es.lua]
+```
+./taskvelox.lua [OPTIONS] [--] [exercise file]
+```
 
-then keep pressing `Enter` to continue execution.
-At the moment the only way to terminate execution is to `Ctrl-C` or by killing lua process.
+2. Keep pressing `Enter` to continue execution.
+
+At the moment, the only way to terminate execution is to `Ctrl-C`, or by killing lua process.
 *(`CtrlZ` is used by Bash to suspend, not terminate)*
+
+### Arguments
+
+| Name | Description |
+| - | - |
+| `-h` `--help`     | Show help message |
+| `-v` `--verbose`  | Increase verbosity level |
 
 ### Exercise format
 
-Note: this format is subject to changes.
+You can find some example exercises in this repo, also the complete official Lua 5.3 reference is found [here](https://www.lua.org/manual/5.3/).
+
+Note: this format is subject to change.
 
 ```lua
 --[[
@@ -42,18 +57,24 @@ definition of resources:
     0 means no limits, negative values are unexpected behavior.
 ]]
 resources { resourceName = maxUsage, ... }
+
 --This is a binary semaphore, its value range is [0..1]
 semBin.name = initialValue
+
 --This is a counting semaphore, its value range is [0..∞]
 semInt.name = initialValue
+
 --This is a counter, it can have any numeric value
 counterName = initialValue
+
 --This is a custom object with custom non-numeric value
 anythingElseName = initialValue
 arrayName = {val1,val2,val3,--[[ ... ,]],valN}
+
 --ad-hoc lua syntax extensions:
 arrayName = new {length, initialValue}
 -- ...
+
 
 --[[
 This is a process.
@@ -87,10 +108,10 @@ function processName2(pid)
 end
 ```
 
-You can find some example exercises in this repo, also the complete official Lua 5.3 reference is found [here](https://www.lua.org/manual/5.3/).
-
 ### TODO
 
 * [ ] Full support for tables
+* [ ] Recursive table access log
+* [ ] Custom process generation
 * [ ] metatables sandbox
 * [ ] `debug` library sandbox

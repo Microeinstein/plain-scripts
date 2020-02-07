@@ -1,4 +1,4 @@
-#!/bin/lua
+#!/usr/bin/lua5.3
 
 -- use __newindex and __index to call coroutine.yield()
 -- scopes + coroutines + metatables
@@ -6,8 +6,60 @@
 --require "lanes".configure()
 
 math.randomseed(os.time())
-msg_badinput = "\027[A\027[K\027[1;31mWrong input.\027[0m"
-msg_interr   = "\n\027[1;33mInterrupt received.\027[0m"
+i18n = {
+    ita = {
+        bad_input          = "\027[A\027[K\027[1;31mInput non valido.\027[0m",
+        interr_rcv         = "\n\027[1;33mInterrotto.\027[0m",
+        unk_long_arg       = "\27[93mArgomento lungo sconosciuto: %s\n\n",
+        unk_short_arg      = "\27[93mArgomento corto sconosciuto: %s\n\n",
+        arg_err_one_exfile = "\27[93mScusa, solo un esercizio per favore.\n\n",
+        role_proc          = "processo",
+        role_sembin        = "semaforo binario",
+        role_semint        = "semaforo intero",
+        role_cnter         = "contatore",
+        role_cust          = "altro: %s",
+        role_res           = "risorsa",
+        role_intern        = "interno: %s",
+        exfiles_not_found  = "Esercizi non trovati."..[[
+Specifiche:
+    - codice lua
+    - nome del file terminante in "%s"
+    - presenti nella stessa cartella di questo script
+]],
+        avail_exfiles      = "Esercizi disponibili:\027[95m",
+        select_exfile      = "Seleziona esercizio: ",
+        warn_redefine      = '\n\27[93mAttenzione\27[0m: "%s" era definito di un altro tipo.',
+        warn_redef_int     = '\n\27[93mAttenzione\27[0m: "%s" esiste già internamente come %s, verrà nascosto.',
+        err_hint_syntax    = "→ Probabilmente Lua non supporta la sintassi usata in quel punto.",
+        err_hint_expect    = "→ Probabilmente ti sei dimenticato di chiudere o definire qualcosa.",
+        err_hint_file      = "→ File inesistente",
+        err_hint_unk       = "→ Sono sicuro ci sia un errore, non so dirti la causa...",
+        success_read       = "\27[92mLetto con successo.\27[0m",
+        summary_res        = "\n\27[91mRisorse\27[0m:",
+        summary_sem        = "\n\27[93mSemafori\27[0m:",
+        summary_cnt        = "\n\27[96mContatori\27[0m:",
+        summary_oth        = "\n\27[92mAltro\27[0m:",
+        summary_prc        = "\n\27[95mProcessi\27[0m:",
+        err_no_procs       = "\27[91mL'esercizio non ha senso: non contiene processi. Termino...\27[0m",
+        sim_wait           = '\27[35m%s\27[90m attende \27[33m%s\27[0m\n',
+        sim_enter          = '\27[95m%s\27[0m entra in \27[93m%s\27[0m',
+        sim_leave          = '\27[95m%s\27[0m esce da \27[93m%s\27[0m',
+        sim_access         = '\27[35m%s\27[90m accede a \27[36m%s\27[90m',
+        sim_read           = '\27[35m%s\27[90m legge \27[36m%s\27[90m',
+        sim_assign         = '\27[95m%s\27[0m assegna \27[96m%s\27[0m%s',
+        sim_use            = '\27[95m%s\27[0m usa \27[91m%s\27[0m',
+        sim_release        = '\27[95m%s\27[0m rilascia \27[91m%s\27[0m',
+        sim_err_res_assign = 'tentativo di assegnazione alla risorsa "%s"',
+        sim_err_res_busy   = 'tentativo di utilizzare la risorsa occupata "%s"',
+        sim_err_lua_unk    = "Lua non conosce questa parola chiave",
+        sim_err_sem_unk    = "\27[93m(Stai usando il nome di un semaforo non definito, typo?)\27[0m",
+        sim_err_syntax     = "\27[93m(Errore sintassi)\27[0m ",
+        sim_err            = "\27[93m(Errore simulazione)\27[0m ",
+        sim_start          = "\27[93mSimulazione avviata, continua a premere Invio.\27[0m",
+        sim_err_deadlock   = "\27[1;91mDeadlock?\27[0;91m Controlla i tuoi semafori.\27[0m\n"
+    }
+}
+msgs = i18n.ita
 
 
 --[[INTERNALS]]
@@ -30,7 +82,7 @@ function ask(fmt, ...)
     end
     local line
     if not pcall(function() line = io.read() end) then
-        print(msg_interr)
+        print(msgs.interr_rcv)
         os.exit(1)
     end
     return line
@@ -55,13 +107,13 @@ function askintpos(fmt, ...)
     local function f(n)
         return n >= 0 and n % 1 == 0
     end
-    return asknum(fmt, f, msg_badinput, ...)
+    return asknum(fmt, f, msgs.bad_input, ...)
 end
 function askint1(fmt, ...)
     local function f(n)
         return n > 0 and n % 1 == 0
     end
-    return asknum(fmt, f, msg_badinput, ...)
+    return asknum(fmt, f, msgs.bad_input, ...)
 end
 function askchoicek(fmt, retry_msg, tbl, ...)
     local choice
@@ -76,7 +128,7 @@ function askchoicek(fmt, retry_msg, tbl, ...)
     until false
 end
 function askchoicek_(fmt, tbl, ...)
-    return askchoicek(fmt, msg_badinput, tbl, ...)
+    return askchoicek(fmt, msgs.bad_input, tbl, ...)
 end
 function askchoicev(fmt, retry_msg, tbl, ...)
     local choice
@@ -91,7 +143,7 @@ function askchoicev(fmt, retry_msg, tbl, ...)
     until false
 end
 function askchoicev_(fmt, tbl, ...)
-    return askchoicev(fmt, msg_badinput, tbl, ...)
+    return askchoicev(fmt, msgs.bad_input, tbl, ...)
 end
 function round(n)
     return math.floor(n + 0.5)
@@ -137,6 +189,12 @@ path.all_cmd   = [[find "%s" -maxdepth 1 -printf '%%f\n']]
 path.dirr_cmd  = [[find "%s" -type d -printf '%%P\n']]
 path.filer_cmd = [[find "%s" -type f -printf '%%P\n']]
 path.allr_cmd  = [[find "%s" -printf '%%P\n']]
+function math.isInteger(num)
+    return num % 1 == 0
+end
+function math.between(a, v, b)
+    return math.max(a, math.min(v, b))
+end
 function utf8.len(str)
     --if i > 0 and j > 0 and i < j then
     --  return 0
@@ -239,26 +297,34 @@ function process.getOutput(cmd)
     output:close()
     return t
 end
+function string.chars(self)
+    local l = utf8.len(self)
+    local ch = {}
+    for i = 1, l do
+        table.insert(ch, utf8.sub(self, i, i))
+    end
+    return ch
+end
 function string.contains(self, str)
     if self and str then
         if self == str then
-            return true
+            return true, 0
         end
         local lenA = utf8.len(self)
         local lenB = utf8.len(str)
         local lenMin = lenA - lenB + 1
         if lenMin < 1 then
-            return false
+            return false, -1
         end
         for i = 1, lenMin do
             local slice = utf8.sub(self, i, i + lenB - 1)
             if slice == str then
-                return true
+                return true, i
             end
         end
-        return false
+        return false, -1
     else
-        return false
+        return false, -1
     end
 end
 function string.split(self, sep, esc)
@@ -394,6 +460,36 @@ function table.len(self, nils) --nils = count also nil values with an integral k
     end
     return c + ma
 end
+function table.sub(self, from, to)
+    to = to or -1
+    if from == 1 and to == -1 then
+        return self
+    end
+    local l = #self
+    if l == 0 then
+        return {}
+    end
+    if from < 0 then from = l + from + 1 end
+    if to < 0 then to = l + to + 1 end
+    if from > to then
+        return {}
+    elseif from == to then
+        return { self[from] }
+    end
+    local ret = {}
+    local iret = 1
+    for i, v in ipairs(self) do
+        if i <= to then
+            if i >= from then
+                ret[iret] = v
+                iret = iret + 1
+            end
+        else
+            return ret
+        end
+    end
+    return ret
+end
 function table.where(self, lambda, ...)
     local ret = {}
     for k, v in pairs(self) do
@@ -454,14 +550,93 @@ function table.removeObj(self, obj)
     return true
 end
 
+function printlines(...)
+    local args = {...}
+    local len = table.len(args, true)
+    for k=1, len do
+        local v = args[k]
+        local s
+        if type(v) == "nil" then
+            s = ""
+        else
+            s = tostring(v)
+        end
+        print(s)
+    end
+end
+
 
 --[[REAL CODE]]
---selezione esercizio
+function __help_msg()
+    printlines(
+"\27[1;91mTaskVelox\27[0m v2"
+,"\27[4mAuthor: Microeinstein\27[0m"
+,"Lua script to help debugging of Computer Science exercises"
+,"in concurrent processes synchronization."
+,nil
+,"\27[1;92mUsage\27[0m: "..arg[0].." [OPTIONS] [--] [exercise file]"
+,nil
+,"\27[1;93mOptions\27[0m:"
+,"  -h  --help                  Show this help"
+,"  -v  --verbose               Increase verbosity level"
+,nil
+,"\27[1;95mExamples\27[0m:"
+,"  "..arg[0].." -v"
+,"  "..arg[0].." -vv -- mySemaphores_es.lua"
+,"  "..arg[0].." --help"
+,nil
+    );
+    os.exit(0)
+end
+
+--lettura argomenti
 ex_suffix = "_es"
 extension = ex_suffix..".lua"
-if arg[1] then
-    choice = arg[1]
-else
+verbosity = 0
+_no_more_args = false
+_next_arg_value = nil
+for i,arg in ipairs(arg) do
+    if _no_more_args then
+        break
+    end
+    if arg == "--" then
+        _no_more_args = true
+    elseif string.startsWith(arg, "--") then --long option
+        _,arg = string.split(arg, 2)
+        if arg == "help" then
+            __help_msg()
+        elseif arg == "verbose" then
+            verbosity = verbosity + 1
+        else
+            --argparts = string.split(arg, "=")
+            --TODO
+            printf(msgs.unk_long_arg, arg)
+            os.exit(1)
+        end
+    elseif string.startsWith(arg, "-") then --short option(s)
+        _,arg = string.split(arg, 1)
+        for i,arg in ipairs(string.chars(arg)) do
+            if arg == "v" then
+                verbosity = verbosity + 1
+            elseif arg == "h" then
+                __help_msg()
+            else
+                printf(msgs.unk_short_arg, arg)
+                os.exit(1)
+            end
+            --TODO
+        end
+    else
+        if exercise then
+            printf(msgs.arg_err_one_exfile, arg)
+            os.exit(1)
+        end
+        exercise = arg
+    end
+end
+
+--selezione interattiva
+if #arg < 1 or not exercise then
     choices = path.getFiles(".",false)
     --for k,v in pairs(choices) do print(k,v) end
     choices = table.compact(table.where(choices,
@@ -471,11 +646,7 @@ else
     ))
     --for k,v in pairs(choices) do print(k,v) end
     if #choices == 0 then
-        print("Esercizi non trovati.")
-        print([[Specifiche:
-    - codice lua
-    - nome del file terminante in "]]..extension..[["
-    - presenti nella stessa cartella di questo script]])
+        printf(msgs.exfiles_not_found)
     end
     choices = table.select(choices,
         function(k,v)
@@ -483,61 +654,62 @@ else
         end
     )
 
-    io.write("Esercizi disponibili:\027[95m")
+    io.write(msgs.avail_exfiles)
     for _,v in ipairs(choices) do
         io.write(" "..v)
     end
     print("\027[0m")
-    choice = askchoicev_("Seleziona esercizio: ", choices)
-    choice = choices[choice]..extension
+    choice = askchoicev_(msgs.select_exfile, choices)
+    exercise = choices[choice]..extension
+    choice = nil
+    choices = nil
 end
 
 
---lettura esercizio (fucking magic)
-procs   = {}
-nprocs  = {}
-semBin  = {}
-semInt  = {}
-counter = {}
-newG    = {}
-res     = {}
-roles   = {}
-sandbox = {
-    procs   = procs,
-    semBin  = semBin,
-    semInt  = semInt,
-    counter = counter,
-    newG    = newG,
-    res     = res,
-    roles   = roles,
-    __G     = _G,
-    resources = function(r)
-        for k,v in pairs(r) do
-            local re = {}
-            re.maxusage = v
-            re.using = {}
-            res[k] = re
-            setRole(k,res)
-        end
+--lettura esercizio (magic)
+procs  = {}
+nprocs = {}
+semBin = {}
+semInt = {}
+cnters = {}
+newG   = {}
+res    = {}
+roles  = {}
+resources = function(r)
+    for k,v in pairs(r) do
+        local re = {}
+        re.maxusage = v
+        re.using = {}
+        res[k] = re
+        setRole(k,res)
     end
-}
+end
+--[[procs   = procs,
+semBin  = semBin,
+semInt  = semInt,
+counter = counter,
+newG    = newG,
+res     = res,
+roles   = roles,
+__G     = _G,]]
+sandbox = {}
 function getRole(k)
     local r = roles[k]
-    if r == procs       then return 'process'
-    elseif r == semBin  then return 'semBin'
-    elseif r == semInt  then return 'semInt'
-    elseif r == counter then return 'counter'
-    elseif r == newG    then return 'custom '..type(newG[k])
-    elseif r == res     then return 'resource'
+    if r == procs      then return msgs.role_proc
+    elseif r == semBin then return msgs.role_sembin
+    elseif r == semInt then return msgs.role_semint
+    elseif r == cnters then return msgs.role_cnter
+    elseif r == newG   then return string.format(msgs.role_cust, type(newG[k]))
+    elseif r == res    then return msgs.role_res
     end
-    return 'internal '..type(_G[k])
+    return string.format(msgs.role_intern, type(_G[k]))
 end
 function setRole(k,r)
     if roles[k] and roles[k] ~= r then
-        printf('\n\27[93mAttenzione\27[0m: "%s" era definito di un altro tipo.', k)
+        printf(msgs.warn_redefine, k)
         rawset(roles[k],k,nil) --remove previous table-associated value
     elseif _ENV[k] then
-        printf('\n\27[93mAttenzione\27[0m: "%s" esiste già internamente come %s, verrà nascosto.', k, type(_ENV[k]))
+        printf(msgs.warn_redef_int, k, type(_ENV[k]))
     end
     roles[k] = r
 end
@@ -554,7 +726,7 @@ loadmeta = {
         if t == procs
         or t == semBin
         or t == semInt
-        or t == counter then
+        or t == cnters then
             rawset(t,k,v)
             setRole(k,t)
             return
@@ -569,8 +741,8 @@ loadmeta = {
             table.insert(nprocs,np)
             setRole(k,procs)
         elseif ty == "number" then
-            rawset(counter,k,v)
-            setRole(k,counter)
+            rawset(cnters,k,v)
+            setRole(k,cnters)
         else
             rawset(newG,k,v)
             setRole(k,newG)
@@ -580,23 +752,30 @@ loadmeta = {
 setmetatable(procs,   loadmeta)
 setmetatable(semBin,  loadmeta)
 setmetatable(semInt,  loadmeta)
-setmetatable(counter, loadmeta)
+setmetatable(cnters,  loadmeta)
 setmetatable(newG,    loadmeta)
 setmetatable(sandbox, loadmeta)
 tryload = {}
-tryload.ok, tryload.error = pcall(loadfile(choice, nil, sandbox))
+tryload.ok, tryload.error = loadfile(exercise, nil, sandbox) --function OR nil + error
+if tryload.ok then
+    tryload.ok, tryload.error = pcall(tryload.ok) --retvalue OR nil + error
+end
 setmetatable(sandbox, nil)
-print()
 if not tryload.ok then
     printf("\27[91m%s\27[0m\n", tryload.error)
     if string.contains(tryload.error, "syntax error") then
-        print("→ Probabilmente Lua non supporta la sintassi usata in quel punto.")
+        print(msgs.err_hint_syntax)
     elseif string.contains(tryload.error, "expected") then
-        print("→ Probabilmente ti sei dimenticato di chiudere qualcosa.")
+        print(msgs.err_hint_expect)
+    elseif string.contains(tryload.error, "No such file or directory") then
+        print(msgs.err_hint_file)
+    else
+        print(msgs.err_hint_unk)
     end
-    --os.exit(1)
+    print()
+    os.exit(1)
 end
-print("\27[92mLetto con successo.\27[0m")
+print(msgs.success_read)
 
 
 function maxValueBy(tables, selector)
@@ -611,20 +790,20 @@ function maxValueBy(tables, selector)
 end
 
 
---stampa nomi trovati
+--sommario
 listSpace = 0
-for k,v in pairs(res) do     if #k > listSpace then listSpace = #k end end
-for k,v in pairs(semBin) do  if #k > listSpace then listSpace = #k end end
-for k,v in pairs(semInt) do  if #k > listSpace then listSpace = #k end end
-for k,v in pairs(counter) do if #k > listSpace then listSpace = #k end end
-for k,v in pairs(newG) do    if #k > listSpace then listSpace = #k end end
-for k,v in pairs(procs) do   if #k > listSpace then listSpace = #k end end
+for k,v in pairs(res) do    if #k > listSpace then listSpace = #k end end
+for k,v in pairs(semBin) do if #k > listSpace then listSpace = #k end end
+for k,v in pairs(semInt) do if #k > listSpace then listSpace = #k end end
+for k,v in pairs(cnters) do if #k > listSpace then listSpace = #k end end
+for k,v in pairs(newG) do   if #k > listSpace then listSpace = #k end end
+for k,v in pairs(procs) do  if #k > listSpace then listSpace = #k end end
 listSpace = listSpace + 3
 
 empty = true
 for k,v in pairs(res) do
     if empty then
-        print("\n\27[91mRisorse\27[0m:")
+        print(msgs.summary_res)
         empty = false
     end
     printfAlign("  %s", listSpace, k)
@@ -634,7 +813,7 @@ end
 empty = true
 for k,v in pairs(semBin) do
     if empty then
-        print("\n\27[93mSemafori\27[0m:")
+        print(msgs.summary_sem)
         empty = false
     end
     printfAlign("  %s", listSpace, k)
@@ -646,9 +825,9 @@ for k,v in pairs(semInt) do
 end
 
 empty = true
-for k,v in pairs(counter) do
+for k,v in pairs(cnters) do
     if empty then
-        print("\n\27[96mContatori\27[0m:")
+        print(msgs.summary_cnt)
         empty = false
     end
     printfAlign("  %s", listSpace, k)
@@ -658,7 +837,7 @@ end
 empty = true
 for k,v in pairs(newG) do
     if empty then
-        print("\n\27[92mAltro\27[0m:")
+        print(msgs.summary_oth)
         empty = false
     end
     printfAlign("  %s", listSpace, k)
@@ -670,7 +849,7 @@ end
 empty = true
 for k,v in pairs(procs) do
     if empty then
-        print("\n\27[95mProcessi\27[0m:")
+        print(msgs.summary_prc)
         empty = false
     end
     printf("  %s\n", k)
@@ -681,41 +860,46 @@ print()
 --preparazione
 pcount = #nprocs
 if pcount < 1 then
-    print("\27[91mL'esercizio non ha senso: non contiene processi. Termino...\27[0m")
+    print(msgs.err_no_procs)
     os.exit(1)
 end
 pnmlen = #maxValueBy(procs, function(k,v) return #k end).name
 msgSpacer = pnmlen + 42
 msgTidSpc = -5
 pause = false
-msg = {
+
+--messaggi simulazione
+simulmsg = {
     wait = function(taskNum, procName, semName)
-        pause = false
+        if verbosity < 1 then return end
+        --pause = false
         printfAlign('\27[90m%d. ', msgTidSpc-5, taskNum)
-        printf('\27[35m%s\27[90m attende \27[33m%s\27[0m\n', procName, semName)
+        printf(msgs.sim_wait, procName, semName)
     end,
     enter = function(taskNum, procName, semName, semValue)
         pause = true
         printfAlign('%d. ', msgTidSpc, taskNum)
-        printfAlign('\27[95m%s\27[0m entra in \27[93m%s\27[0m', msgSpacer, procName, semName)
+        printfAlign(msgs.sim_enter, msgSpacer, procName, semName)
         printf(' (%d)\n', semValue)
     end,
     leave = function(taskNum, procName, semName, semValue)
         pause = true
         printfAlign('%d. ', msgTidSpc, taskNum)
-        printfAlign('\27[95m%s\27[0m esce da \27[93m%s\27[0m', msgSpacer, procName, semName, semValue)
+        printfAlign(msgs.sim_leave, msgSpacer, procName, semName, semValue)
         printf(' (%d)\n', semValue)
     end,
     access = function(taskNum, procName, varName, varType)
+        if verbosity < 2 then return end
         --pause = true
         printfAlign('\27[90m%d. ', msgTidSpc-5, taskNum)
-        printfAlign('\27[35m%s\27[90m accede a \27[36m%s\27[90m', msgSpacer+2, procName, varName)
+        printfAlign(msgs.sim_access, msgSpacer+2, procName, varName)
         printf(' (%s)\27[0m\n', varType)
     end,
     read = function(taskNum, procName, varName, varValue)
+        if verbosity < 2 then return end
         --pause = true
         printfAlign('\27[90m%d. ', msgTidSpc-5, taskNum)
-        printfAlign('\27[35m%s\27[90m legge \27[36m%s\27[90m', msgSpacer+2, procName, varName)
+        printfAlign(msgs.sim_read, msgSpacer+2, procName, varName)
         local vvd = dump(varValue)
         if not string.startsWith(vvd, '[') then
             vvd = '('..vvd..')'
@@ -725,19 +909,19 @@ msg = {
     assign = function(taskNum, procName, varName, varValue, new)
         pause = true
         printfAlign('%d. ', msgTidSpc, taskNum)
-        printfAlign('\27[95m%s\27[0m assegna \27[96m%s\27[0m%s', msgSpacer, procName, varName, new and " (nuova)" or "")
+        printfAlign(msgs.sim_assign, msgSpacer, procName, varName, new and " (nuova)" or "")
         printf('= %s\n', varValue)
     end,
     use = function(taskNum, procName, resName, resValue)
         pause = true
         printfAlign('%d. ', msgTidSpc, taskNum)
-        printfAlign('\27[95m%s\27[0m usa \27[91m%s\27[0m', msgSpacer, procName, resName, resValue)
+        printfAlign(msgs.sim_use, msgSpacer, procName, resName, resValue)
         printf(' (%d)\n', resValue)
     end,
     release = function(taskNum, procName, resName, resValue)
         pause = true
         printfAlign('%d. ', msgTidSpc, taskNum)
-        printfAlign('\27[95m%s\27[0m rilascia \27[91m%s\27[0m', msgSpacer, procName, resName, resValue)
+        printfAlign(msgs.sim_release, msgSpacer, procName, resName, resValue)
         printf(' (%d)\n', resValue)
     end,
     init = function(taskNum, procName)
@@ -758,23 +942,23 @@ msg = {
 function p(task, tasknum, sem)
     local st = roles[sem]
     if st[sem] < 1 then
-        msg.wait(tasknum, task.name, sem)
+        simulmsg.wait(tasknum, task.name, sem)
     end
     while st[sem] < 1 do
         coroutine.yield()
     end
     st[sem] = st[sem] - 1
-    msg.enter(tasknum, task.name, sem, st[sem])
+    simulmsg.enter(tasknum, task.name, sem, st[sem])
 end
 function v(task, tasknum, sem)
     local st = roles[sem]
     if st ~= semBin or st[sem] < 1 then
         st[sem] = st[sem] + 1
     end
-    msg.leave(tasknum, task.name, sem, st[sem])
+    simulmsg.leave(tasknum, task.name, sem, st[sem])
 end
 
---gestione processi (chiamati tasks) (still fucking magic)
+--gestione processi (chiamati tasks) (still magic)
 useResDummy = function() end
 ltp = 0
 tmax = pcount*3
@@ -785,7 +969,7 @@ taskmeta = {
     __newindex = function(t,k,v) --write
         local task, tasknum = coroutine.yield()
         local r = roles[k]
-        msg.assign(tasknum, task.name, k, v, not r)
+        simulmsg.assign(tasknum, task.name, k, v, not r)
         if not r then
             --error("attempt to assign to unknown object: ('"..k.."')")
             rawset(t.newG,k,v)
@@ -793,7 +977,7 @@ taskmeta = {
             return
         end
         if r == res then
-            error("attempt to assign to a resource: ('"..k.."')")
+            error(string.format(msgs.sim_err_res_assign, k))
         end
         rawset(r,k,v)
     end,
@@ -801,10 +985,17 @@ taskmeta = {
         --print("use: "..k)
         local task, tasknum = coroutine.yield()
         local lk = string.lower(k)
-        msg.access(tasknum, task.name, k, getRole(k))
-        if lk == 'p'     then return function(n) return p(task, tasknum, n) end
-        elseif lk == 'v' then return function(n) return v(task, tasknum, n) end
+        local mapped = {
+            p = function(n) return p(task, tasknum, n) end,
+            v = function(n) return v(task, tasknum, n) end
+        }
+        for k,v in pairs(mapped) do
+            if lk == k then
+                simulmsg.access(tasknum, task.name, k, getRole(k))
+                return v
+            end
         end
+        simulmsg.access(tasknum, task.name, k, getRole(k))
         local r = roles[k]
         if not r then
             --error("attempt to use undefined object: ('"..k.."')")
@@ -816,16 +1007,19 @@ taskmeta = {
         local obj = r[k]
         if r == res then --gestione risorse
             if obj.maxusage > 0 and #obj.using == obj.maxusage then
-                error("attempt to use busy resource: ('"..k.."')")
+                error(string.format(msgs.sim_err_res_busy, k))
             end
             table.insert(obj.using,tasknum)
-            msg.use(tasknum, task.name, k, #obj.using)
+            simulmsg.use(tasknum, task.name, k, #obj.using)
             task, tasknum = coroutine.yield()
             table.removeObj(obj.using,tasknum)
-            msg.release(tasknum, task.name, k, #obj.using)
+            simulmsg.release(tasknum, task.name, k, #obj.using)
             return useResDummy
         end
-        msg.read(tasknum, task.name, k, obj)
+        if not obj and k == "continue" then
+            error(msgs.sim_err_lua_unk)
+        end
+        simulmsg.read(tasknum, task.name, k, obj)
         return obj
     end
 }
@@ -845,12 +1039,12 @@ function addNewTask(procNum)
     t.id = tid
     tcount = tcount + 1
     tasks[tcount] = t
-    msg.init(tid, t.p.name)
+    simulmsg.init(tid, t.p.name)
 end
 function stepTask(taskNum)
     local t = tasks[taskNum]
     if coroutine.status(t.cr) == "dead" then
-        msg.term(t.id, t.p.name)
+        simulmsg.term(t.id, t.p.name)
         table.remove(tasks, taskNum)
         tcount = tcount - 1
         return
@@ -860,35 +1054,36 @@ function stepTask(taskNum)
     if not ok then
         local cust = ""
         if string.endsWith(err, "attempt to index a nil value (local 'st')") then
-            err = err.."\n\27[93m(Stai usando il nome di un semaforo non definito, typo?)\27[0m"
+            err = err..msgs.sim_err_sem_unk
         else
-            if string.startsWith(err, choice) then
-                cust = "\27[93m(Errore tuo)\27[0m "
+            if string.startsWith(err, exercise) then
+                cust = msgs.sim_err_syntax
             else
-                cust = "\27[91m(Errore interno)\27[0m "
+                cust = msgs.sim_err
             end
             err = cust..err
         end
+        err = "\n"..err
         error(err)
     end
 end
 
 
 --esecuzione
-print("\27[93mSimulazione avviata, continua a premere Invio.\27[0m")
+print(msgs.sim_start)
 nonpause = 0
 while true do
     pause = false
     local op = randInt(0,1)
     if tcount == 0 or (op == 1 and tcount < tmax) then
-        ltp = 1 + (ltp % pcount)
+        ltp = 1 + (ltp % pcount) --round robin
         addNewTask(ltp)
     end
     op = randInt(1, tcount)
     stepTask(op) --if not stepTask(op) then break end
     nonpause = nonpause + 1
     if nonpause > 500000 then
-        printf("\27[1;91mDeadlock?\27[0;91m Controlla i tuoi semafori.\27[0m\n")
+        printf(msgs.sim_err_deadlock)
         os.exit(2)
     end
     if pause then
