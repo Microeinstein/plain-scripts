@@ -163,10 +163,8 @@ setup_PS1() {
         # __MYV[cols]="$cols"
         
         # reduce known
-        case "$d" in
-            "$HOME")        d='~'        ;;
-            '/mnt/files/'*) d="${d: 11}" ;;
-        esac
+        d="${d/"$HOME"/'~'}"
+        d="${d#"/mnt/files/"}"
         ((${#d} < 11)) && {
             # __MYV[pdir]="$d"
             echo "$d"
