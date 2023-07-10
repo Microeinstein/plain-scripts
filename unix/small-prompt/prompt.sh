@@ -1,3 +1,4 @@
+#!/bin/bash
 # 2023-07-10 - Microeinstein
 
 
@@ -7,7 +8,8 @@ bind 'set completion-ignore-case on'
 
 gen_rgb_rainbow() {
     # call by hand
-    local py="$(cat <<EOF
+    local py
+    py="$(cat <<EOF
 from sys import argv
 from colorsys import hsv_to_rgb
 l = 30
@@ -30,7 +32,8 @@ get_cursor_pos() {
     # prints sequence to stdout, terminal answers to stdin - very fragile
     # WILL reset previous stdin apparently?
     # based on a script from http://invisible-island.net/xterm/xterm.faq.html
-    local __ oldstty="$(stty -g)"
+    local __ oldstty
+    oldstty="$(stty -g)"
     stty raw -echo min 0
     read -r -s -p$'\e[6n' -d\[ __ >/dev/tty
     IFS=';' read -r -s -dR row col >/dev/tty
@@ -38,6 +41,8 @@ get_cursor_pos() {
 } </dev/tty
 
 
+# desired: printf expansions, variables in single quotes, ecc...
+# shellcheck disable=SC2016,SC2059
 setup_PS1() {
     # basics
     local -A C=(
@@ -191,14 +196,15 @@ setup_PS1() {
         
         # reduce long
         local -n r=BASH_REMATCH
-        local n
-        for n in {1..20}; do
+        local __
+        for __ in {1..20}; do
             [[ "$d" =~ /([^/*]{16,}) ]] || break
             d="${d//"${r[0]}"/"/${r[1]:0:7}*${r[1]: -7}"}"
         done
         
         # cut
-        local cols="$(tput cols)"
+        local cols
+        cols="$(tput cols)"
         local cut=$((${#d} - (cols / 3 - ${#USER} - 4)))
         ((cut = cut < 2 ? 0 : cut))
         ((cut)) && d="*${d: $cut}"
@@ -264,45 +270,45 @@ setup_PS1() {
     # https://github.com/powerline/fonts/issues/31#issuecomment-1023622834
     #   half_circle_thick 
     #   hard_divider      
-    local ps1=("${excd}${anim}" '$(__MYEXIT) '  "$lcmd"  $(FMT r) )
+    local ps1=("${excd}${anim}" '$(__MYEXIT) '  "$lcmd"  "$(FMT r)" )
     #ps1+=("${B[cmdn]} ")  # debug
     if ((basic)); then
         if ((short)); then
             # workdir $>
-            ps1+=(                  '$(__MYPWD) '
-                $(FMT b fc="$stil")  ${B[euid]}
-                $(FMT nb)            '>'
+            ps1+=(                     '$(__MYPWD) '
+                "$(FMT b fc="$stil")"  "${B[euid]}"
+                "$(FMT nb)"            '>'
             )
         else
             # user) workdir $>
             ps1+=(
-                $(FMT b fc="$stil")  ${B[user]}
-                $(FMT r flwhi)       ') $(__MYPWD) '
-                $(FMT flusr)         ${B[euid]}
-                $(FMT fdusr)         '>'
+                "$(FMT b fc="$stil")"  "${B[user]}"
+                "$(FMT r flwhi)"       ') $(__MYPWD) '
+                "$(FMT flusr)"         "${B[euid]}"
+                "$(FMT fdusr)"         '>'
             )
         fi
     elif ((short)); then
         # (( workdir >>
         ps1+=(
-            $(FMT fc="$gray"           )  ''
-            $(FMT bc="$gray" fr        )  ' $(__MYPWD) '
-            $(FMT fc="$gray" bc="$stil")  ''
-            $(FMT br         fc="$stil")  ''
+            "$(FMT fc="$gray"           )"  ''
+            "$(FMT bc="$gray" fr        )"  ' $(__MYPWD) '
+            "$(FMT fc="$gray" bc="$stil")"  ''
+            "$(FMT br         fc="$stil")"  ''
         )
     else
         # (( user )) workdir >>
         ps1+=(
-            $(FMT fc="$stil"           )  ''
-            $(FMT bc="$stil" fdbla     )  ${B[user]}
-            $(FMT fc="$stil" bc="$gray")  ''
-            $(FMT fr                   )  ' $(__MYPWD) '
-            $(FMT bdusr      fc="$gray")  ''
-            $(FMT fdusr      br        )  ''
+            "$(FMT fc="$stil"           )"  ''
+            "$(FMT bc="$stil" fdbla     )"  "${B[user]}"
+            "$(FMT fc="$stil" bc="$gray")"  ''
+            "$(FMT fr                   )"  ' $(__MYPWD) '
+            "$(FMT bdusr      fc="$gray")"  ''
+            "$(FMT fdusr      br        )"  ''
         )
     fi
-    ps1+=($(FMT r)  ' ')
-    ((basic)) && ps1+=($(FMT flwhi))
+    ps1+=("$(FMT r)"  ' ')
+    ((basic)) && ps1+=("$(FMT flwhi)")
     
     local IFS=''
     PS0="$(FMT r)"
