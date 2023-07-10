@@ -1,21 +1,25 @@
 # 2023-07-10 - Microeinstein
 
-# Features:
-#   - dynamic prompt based on terminal
-#   - colors:
-#     - full, 256, 8
-#     - rainbow colors
-#     - user=green  root=red
-#     - (hack) detect light theme
-#   - styles:
-#     - {powerline, basic} x {long,short}
-#   - detect return code
-#   - compact current directory based on terminal size
-#   - stay on previous line with no command given
-#   - detect if last command did not end with newline
-# 
-# Unimplemented (technical limitations):
-#   - cannot reprint prompt right after resize
+
+gen_rgb_rainbow() {
+    # call by hand
+    local py="$(cat <<EOF
+from sys import argv
+from colorsys import hsv_to_rgb
+l = 30
+f = lambda n: str(round(n*255))
+for n in range(0,l):
+    c = map(f, hsv_to_rgb(n/l, float(argv[1]), float(argv[2])))
+    c = ';'.join(c)
+    # print(f"\x1b[0;30;48;2;{c}mlorem ipsum\x1b[0m")
+    # print(f"'{c}'", end='  ')
+    print(c)
+EOF
+)"
+    mapfile -t __RAINBOW < <(python -c "$py" "$@")
+    printf "'%s'  "  "${__RAINBOW[@]}" | fold -s
+    echo
+}
 
 
 setup_PS1() {
@@ -74,29 +78,29 @@ setup_PS1() {
     
     
     # rainbow and specific
-    local py="$(cat <<EOF
-from sys import argv
-from colorsys import hsv_to_rgb
-l = 30
-f = lambda n: str(round(n*255))
-for n in range(0,l):
-    c = map(f, hsv_to_rgb(n/l, float(argv[1]), float(argv[2])))
-    c = ';'.join(c)
-    # print(f"\x1b[0;30;48;2;{c}mlorem ipsum\x1b[0m")
-    # print(f"'{c}'", end='  ')
-    print(c)
-EOF
-)"
-
     local gray
     if ((rgb)); then
         C[fc]='38;2;%s'  # truecolor
         C[bc]='48;2;%s'
         if ((light)); then
-            mapfile -t __RAINBOW < <(python -c "$py" .5 .7)
+            __RAINBOW=(
+                '178;89;89'   '178;107;89'  '178;125;89'  '178;143;89'  '178;161;89'
+                '178;178;89'  '161;178;89'  '143;178;89'  '125;178;89'  '107;178;89'
+                '89;178;89'   '89;178;107'  '89;178;125'  '89;178;143'  '89;178;161'
+                '89;178;178'  '89;161;178'  '89;143;178'  '89;125;178'  '89;107;178'
+                '89;89;178'   '107;89;178'  '125;89;178'  '143;89;178'  '161;89;178'
+                '178;89;178'  '178;89;161'  '178;89;143'  '178;89;125'  '178;89;107'
+            )
             gray='218;218;218'
         else
-            mapfile -t __RAINBOW < <(python -c "$py" .5 .9)
+            __RAINBOW=(  #  .5 .95
+                '242;121;121'  '242;145;121'  '242;170;121'  '242;194;121'  '242;218;121'
+                '242;242;121'  '218;242;121'  '194;242;121'  '170;242;121'  '145;242;121'
+                '121;242;121'  '121;242;145'  '121;242;170'  '121;242;194'  '121;242;218'
+                '121;242;242'  '121;218;242'  '121;194;242'  '121;170;242'  '121;145;242'
+                '121;121;242'  '145;121;242'  '170;121;242'  '194;121;242'  '218;121;242'
+                '242;121;242'  '242;121;218'  '242;121;194'  '242;121;170'  '242;121;145'
+            )
             gray='78;78;78'
         fi
     else
@@ -261,8 +265,8 @@ EOF
             $(FMT bc="$stil" fdbla     )  ${B[user]}
             $(FMT fc="$stil" bc="$gray")  ''
             $(FMT fr                   )  ' $(__MYPWD) '
-            $(FMT blusr      fc="$gray")  ''
-            $(FMT flusr      br        )  ''
+            $(FMT bdusr      fc="$gray")  ''
+            $(FMT fdusr      br        )  ''
         )
     fi
     ps1+=($(FMT r)  ' ')
