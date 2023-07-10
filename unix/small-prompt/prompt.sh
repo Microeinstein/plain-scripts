@@ -81,6 +81,8 @@ setup_PS1() {
     # tweaks
     local rever=0  rgb=0  light=0  basic=0  short=0
     
+    [[ ! -v TERM || "$TERM" == dummy ]]                          && return  # terminal is too stupid
+    [[ "$TERM" != xterm* ]]                                      && basic=1
     [[ -v KONSOLE_VERSION ]]                                     && rgb=1
     [[ -v XTERM_VERSION ]]                                       && { rever=1; basic=1; }
     [[ -v TERM_PROGRAM || -v TERMINAL_EMULATOR || -v KATE_PID ]] && short=1
@@ -275,7 +277,7 @@ setup_PS1() {
             # user) workdir $>
             ps1+=(
                 $(FMT b fc="$stil")  ${B[user]}
-                $(FMT r)             ') $(__MYPWD) '
+                $(FMT r flwhi)       ') $(__MYPWD) '
                 $(FMT flusr)         ${B[euid]}
                 $(FMT fdusr)         '>'
             )
@@ -300,6 +302,7 @@ setup_PS1() {
         )
     fi
     ps1+=($(FMT r)  ' ')
+    ((basic)) && ps1+=($(FMT flwhi))
     
     local IFS=''
     PS0="$(FMT r)"
