@@ -1,6 +1,10 @@
 # 2023-07-10 - Microeinstein
 
 
+bind 'set show-all-if-ambiguous on'
+bind 'set completion-ignore-case on'
+
+
 gen_rgb_rainbow() {
     # call by hand
     local py="$(cat <<EOF
@@ -20,6 +24,18 @@ EOF
     printf "'%s'  "  "${__RAINBOW[@]}" | fold -s
     echo
 }
+
+
+get_cursor_pos() {
+    # prints sequence to stdout, terminal answers to stdin - very fragile
+    # WILL reset previous stdin apparently?
+    # based on a script from http://invisible-island.net/xterm/xterm.faq.html
+    local __ oldstty="$(stty -g)"
+    stty raw -echo min 0
+    read -r -s -p$'\e[6n' -d\[ __ >/dev/tty
+    IFS=';' read -r -s -dR row col >/dev/tty
+    stty "$oldstty"
+} </dev/tty
 
 
 setup_PS1() {
@@ -42,7 +58,7 @@ setup_PS1() {
         [br]='49'       # reset
     )
     local -A B=(
-        [user]='\u'  [host]='\h'  [euid]='\$'  [path]='\w'  [cdir]='\W'
+        [user]='\u'  [host]='\h'  [euid]='\$'  [path]='\w'  [cdir]='\W'  [cmdn]='\#'
     )
     
     CSI() { printf '\e[%s' "$*"; }  # do not use in PS1
@@ -147,7 +163,7 @@ setup_PS1() {
     # all functions will be executed in subshell, so will exploit PROMPT_COMMAND
     shopt -s promptvars
     local excd='${__[ $((__IRET=$?)) ]:+}'
-    local upwr='${__[ $((__LASTCMD=304249144)) ]:+}'  # *reset*
+    local lcmd='${__[ $((__MYV[lastcmd]=304249144)) ]:+}'  # *reset*
     local anim='${__[ $((__RNBI=(__RNBI+1) % __RNBL)) ]:+}'
     local stil='${__RAINBOW[ $__RNBI ]}'
     declare -gA __MYV
@@ -205,24 +221,39 @@ setup_PS1() {
     __MYDEBUG() {
         local cur="$BASH_COMMAND"
         trap - DEBUG      # only trap first time, save resources
+        eval -- "${__MYV[tdebug]}"
         [[ "${PROMPT_COMMAND[*]}" == *"$cur"* ]] && return
-        __LASTCMD="$cur"  # save actual last command
+        __MYV[lastcmd]="$cur"  # save actual last command
+    }
+    __MYUPWR() {
+        local cmdn='\#'
+        cmdn="${cmdn@P}"  # expand as if prompt
+        local -n last='__MYV[lastcmdn]'
+        if [[ "$cmdn" == "$last" ]]; then
+            printf "${__MYV[up]}"
+            return 0
+        fi
+        last="$cmdn"
+        ((cmdn)) || return 0
+        
+        # do not detect command output (by cursor position) if bound to some shortcut,
+        # potentially changing READLINE_LINE or READLINE_POINT
+        # https://github.com/dvorka/hstr/blob/4dca4c72d7db104b2c1043551d0d8dc611e0e260/test/sh/tiotcsi-function-bash.sh#L174
+        if [[ "$(bind -S)" != *"${__MYV[lastcmd]}"* ]]; then
+            local row  col
+            get_cursor_pos
+            ((col>1)) && printf ' \e[1;90m↩\e[0m'
+        fi
+        echo
     }
     __MYPROMPT() {
-        if [[ "$__LASTCMD" == '304249144' ]]; then
-            printf "${__MYV[up]}"
-            return
-        fi
-        local IFS=';'  __  row  col
-        printf '\e[6n'
-        read -s -d\[ __
-        read -s -dR row col
-        ((col>1)) && printf ' \e[1;90m↩\e[0m'
-        echo
+        __MYUPWR
+        __MYV[tdebug]="$(trap -p DEBUG)"
+        trap '__MYDEBUG' DEBUG
     }
 
     [[ "${PROMPT_COMMAND[*]}" == *__MYPROMPT* ]] \
-    || PROMPT_COMMAND+=('__MYPROMPT'  "trap '__MYDEBUG' DEBUG")
+    || PROMPT_COMMAND+=('__MYPROMPT')
     
     
     # ps1 building
@@ -231,7 +262,8 @@ setup_PS1() {
     # https://github.com/powerline/fonts/issues/31#issuecomment-1023622834
     #   half_circle_thick 
     #   hard_divider      
-    local ps1=("${excd}${anim}" '$(__MYEXIT) '  "${upwr}"  $(FMT r) )
+    local ps1=("${excd}${anim}" '$(__MYEXIT) '  "$lcmd"  $(FMT r) )
+    #ps1+=("${B[cmdn]} ")  # debug
     if ((basic)); then
         if ((short)); then
             # workdir $>
