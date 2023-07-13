@@ -257,11 +257,12 @@ setup_PS1() {
         # do not detect command output (by cursor position) if bound to some shortcut,
         # potentially changing READLINE_LINE or READLINE_POINT
         # https://github.com/dvorka/hstr/blob/4dca4c72d7db104b2c1043551d0d8dc611e0e260/test/sh/tiotcsi-function-bash.sh#L174
-        if [[ "$(bind -S)" != *"${__MYV[lastcmd]}"* ]]; then
-            local row  col
-            get_cursor_pos
-            ((col>1)) && printf ' \e[1;90m↩\e[0m'
-        fi
+        [[ "${__MYV[lastcmd]}" == 'clear' ]] && return 0
+        # if [[ "$(bind -S)" != *"${__MYV[lastcmd]}"* ]]; then
+        #     local row  col
+        #     get_cursor_pos
+        #     ((col>1)) && printf ' \e[1;90m↩\e[0m'
+        # fi
         echo
     }
     __MYPROMPT() {
