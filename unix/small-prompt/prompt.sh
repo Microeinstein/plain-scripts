@@ -84,14 +84,24 @@ setup_PS1() {
     
     
     # tweaks
+    [[ ! -v TERM || "$TERM" == dummy ]]    && return  # terminal is too stupid
+    
     local rever=0  rgb=0  light=0  basic=0  short=0
     
-    [[ ! -v TERM || "$TERM" == dummy ]]                          && return  # terminal is too stupid
-    [[ "$TERM" != xterm* ]]                                      && basic=1
-    [[ -v KONSOLE_VERSION ]]                                     && rgb=1
-    [[ -v XTERM_VERSION ]]                                       && { rever=1; basic=1; }
-    [[ -v TERM_PROGRAM || -v TERMINAL_EMULATOR || -v KATE_PID ]] && short=1
-    [[ -v TERM_PROGRAM || -v TERMINAL_EMULATOR ]]                && light=1
+    check_term() {
+        # sudo -> env vars will be cleared without -E option
+        local -n sudo=SUDO_UID  konsole=KONSOLE_VERSION  xterm=XTERM_VERSION  \
+                 vscode=TERM_PROGRAM  idea=TERMINAL_EMULATOR  kate=KATE_PID
+        
+        [[ "$TERM" != xterm* || -v xterm ]]    && basic=1
+        [[ -v xterm ]]                         && rever=1
+        [[ -v konsole || -v sudo ]]            && rgb=1
+        [[ -v xterm || -v vscode || -v idea ]] && rgb=0
+        [[ -v vscode || -v idea || -v kate ]]  && short=1
+        [[ -v vscode || -v idea ]]             && light=1
+    }
+    check_term
+    unset -f check_term
     
     if ((rever)); then
         C[fdwhi]='30'
