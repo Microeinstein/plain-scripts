@@ -1,0 +1,36 @@
+# 2022-07-23, Microeinstein
+
+[Desktop Entry]
+Type=Service
+Actions=mp3-320;opus-256;flac;wav2mp3
+Encoding=UTF-8
+Icon=audio-mp3
+MimeType=audio/mp3;audio/aac;audio/mpeg;audio/x-wav;audio/flac;audio/ogg;audio/x-opus+ogg;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Audio
+X-KDE-Submenu[it]=Audio
+
+[Desktop Action mp3-320]
+Exec=konsole -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-mp3-320 %F
+Icon=audio-mp3
+Name=Convert →mp3
+Name[it]=Converti →mp3
+
+[Desktop Action opus-256]
+Exec=konsole -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-opus-256 %F
+Icon=audio-flac
+Name=Convert →opus
+Name[it]=Converti →opus
+
+[Desktop Action flac]
+Exec=konsole -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-flac %F
+Icon=audio-flac
+Name=Convert →flac
+Name[it]=Converti →flac
+
+[Desktop Action wav2mp3]
+Exec=konsole -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-wav2mp3-hq %F
+Icon=audio-mp3
+Name=Convert wav→mp3
+Name[it]=Converti wav→mp3

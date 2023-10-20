@@ -1,0 +1,31 @@
+# 2020-10-18, Microeinstein
+# requires "~/.source/template.xopp"
+
+[Desktop Entry]
+Type=Service
+Actions=open;cgrid;cruled;
+Encoding=UTF-8
+Icon=xournalpp
+MimeType=inode/directory;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Xournal++
+X-KDE-Submenu[it]=Xournal++
+
+[Desktop Action open]
+Exec=bash -c 'cd "$1"; xournalpp' 'dummy-param' %F
+Icon=xournalpp
+Name=Open here
+Name[it]=Apri qui
+
+[Desktop Action cgrid]
+Exec=bash -c 'cd "$1"; cp "$HOME/.source/template-graph.xopp" "$(date '+%%F-Note-%%H-%%M').xopp"' 'dummy-param' %F
+Icon=grid-rectangular
+Name=New note: graph
+Name[it]=Nuova nota: quadretti
+
+[Desktop Action cruled]
+Exec=bash -c 'cd "$1"; cp "$HOME/.source/template-ruled.xopp" "$(date '+%%F-Note-%%H-%%M').xopp"' 'dummy-param' %F
+Icon=bonobo-component-browser
+Name=New note: ruled
+Name[it]=Nuova nota: righe

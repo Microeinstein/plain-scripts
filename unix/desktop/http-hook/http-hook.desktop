@@ -1,0 +1,20 @@
+[Desktop Entry]
+Categories=Network;WebBrowser;
+Comment[it_IT]=
+Comment=
+Exec=/usr/bin/http-hook.sh %u
+GenericName[it_IT]=
+GenericName=
+Icon=filter
+MimeType=text/html;application/xml;application/xhtml+xml;
+Name[it_IT]=HTTP Hook
+Name=HTTP Hook
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+Version=1.0
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+X-MultipleArgs=false

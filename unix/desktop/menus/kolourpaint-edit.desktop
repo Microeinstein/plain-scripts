@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=image/jpeg;image/png;image/bmp;
+Actions=Edit;
+Icon=draw-brush
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+
+[Desktop Action Edit]
+Icon=draw-brush
+Name=Edit
+Name[it]=Modifica
+Exec=kolourpaint "%U"
+
+# pinta
+# gpaint

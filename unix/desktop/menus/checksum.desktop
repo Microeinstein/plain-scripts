@@ -1,0 +1,42 @@
+# 2023-06-28, Microeinstein
+
+[Desktop Entry]
+Type=Service
+Actions=crc32;md5;sha1;sha512
+Encoding=UTF-8
+Icon=view-barcode
+MimeType=all/all;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Digest with
+X-KDE-Submenu[it]=Checksum
+
+# view-media-playcount
+# view-barcode
+# view-barcode-qr
+# seahorse-sign
+# application-certificate-symbolic
+
+[Desktop Action crc32]
+Exec=konsole --hold -e bash -c 'cc=(cksum --untagged -a "$0"); echo "---- ${cc[*]} ----"; ff=(); for a in "$@"; do if [[ -d "$a" ]]; then mapfile -t -O "${#ff[@]}" ff < <(find "$a" -mindepth 1 -maxdepth 1 -type f); else ff+=("$a"); fi; done; "${cc[@]}" "${ff[@]}"; echo ---- done ----'  crc %F
+Icon=view-barcode
+Name=crc32
+#Name[it]=
+
+[Desktop Action md5]
+Exec=konsole --hold -e bash -c 'cc=(cksum --untagged -a "$0"); echo "---- ${cc[*]} ----"; ff=(); for a in "$@"; do if [[ -d "$a" ]]; then mapfile -t -O "${#ff[@]}" ff < <(find "$a" -mindepth 1 -maxdepth 1 -type f); else ff+=("$a"); fi; done; "${cc[@]}" "${ff[@]}"; echo ---- done ----'  md5 %F
+Icon=view-barcode
+Name=md5
+#Name[it]=
+
+[Desktop Action sha1]
+Exec=konsole --hold -e bash -c 'cc=(cksum --untagged -a "$0"); echo "---- ${cc[*]} ----"; ff=(); for a in "$@"; do if [[ -d "$a" ]]; then mapfile -t -O "${#ff[@]}" ff < <(find "$a" -mindepth 1 -maxdepth 1 -type f); else ff+=("$a"); fi; done; "${cc[@]}" "${ff[@]}"; echo ---- done ----'  sha1 %F
+Icon=view-barcode
+Name=sha1
+#Name[it]=
+
+[Desktop Action sha512]
+Exec=konsole --hold -e bash -c 'cc=(cksum --untagged -a "$0"); echo "---- ${cc[*]} ----"; ff=(); for a in "$@"; do if [[ -d "$a" ]]; then mapfile -t -O "${#ff[@]}" ff < <(find "$a" -mindepth 1 -maxdepth 1 -type f); else ff+=("$a"); fi; done; "${cc[@]}" "${ff[@]}"; echo ---- done ----'  sha512 %F
+Icon=view-barcode
+Name=sha512
+#Name[it]=

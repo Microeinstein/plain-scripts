@@ -1,0 +1,9 @@
+[Unit]
+Description=No middle-mouse paste
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "while true; do xsel -fin < /dev/null; sleep .1; done"
+
+# [Install]
+# WantedBy=default.target

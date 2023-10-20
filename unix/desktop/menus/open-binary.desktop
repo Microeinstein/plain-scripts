@@ -1,0 +1,27 @@
+# Microeinstein
+
+[Desktop Entry]
+Type=Service
+Actions=tippse;dhex;
+Icon=application-x-object
+Encoding=UTF-8
+MimeType=application/octet-stream;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Binary
+X-KDE-Submenu[it]=Binario
+
+# ghex
+# draw-calligraphic
+
+[Desktop Action tippse]
+Exec=konsole -e /builds/tippse/tippse %F
+Icon=application-x-object
+Name=Open with tippse
+Name[it]=Apri con tippse
+
+[Desktop Action dhex]
+Exec=konsole -e dhex %F
+Icon=application-x-object
+Name=Open with dhex
+Name[it]=Apri con dhex

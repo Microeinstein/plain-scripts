@@ -1,0 +1,9 @@
+[Unit]
+
+[Timer]
+Unit=simple@%i.service
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+Icon=preferences-theme
+MimeType=image/jpeg;image/png;image/svg+xml;
+Actions=SetAsWallpaper;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+
+# preferences-desktop-wallpaper
+
+[Desktop Action SetAsWallpaper]
+Icon=preferences-theme
+Name=Set as Wallpaper
+Name[it]=Imposta come sfondo del desktop
+Exec=qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript 'var allDesktops = desktops();print (allDesktops);for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin = "org.kde.image";d.currentConfigGroup = Array("Wallpaper", "org.kde.image", "General");d.writeConfig("Image", "%u")}'; 

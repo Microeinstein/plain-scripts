@@ -1,0 +1,13 @@
+[Unit]
+Description=PipeWire profile: %i
+After=pipewire-pulse.service
+
+[Service]
+Type=forking
+# RemainAfterExit=yes
+ExecStart=%h/.local/unix/desktop/audio/PW/pw-profile-start.sh %i
+ExecStop=%h/.local/unix/desktop/audio/PW/pw-profile-stop.sh
+
+# systemctl --user list-units --all --type target
+# [Install]
+# WantedBy=graphical-session.target

@@ -1,0 +1,44 @@
+# 2021-09-03, Microeinstein
+# 2021-02-21, Microeinstein
+# 2022-07-23, Microeinstein
+
+[Desktop Entry]
+Type=Service
+Actions=extract;silent;tg-gif;real-gif;conv-mp4
+Encoding=UTF-8
+Icon=kdenlive-split-audio
+MimeType=video/mp4;video/webm;video/quicktime;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Video
+X-KDE-Submenu[it]=Video
+
+[Desktop Action extract]
+Exec=konsole --hold -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-extract-aac %F
+Icon=kdenlive-split-audio
+Name=Extract audio
+Name[it]=Estrai audio
+
+[Desktop Action silent]
+Exec=konsole --hold -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-silent-audio %F
+Icon=audio-volume-low
+Name=Mute audio
+Name[it]=Silenzia audio
+
+[Desktop Action tg-gif]
+Exec=konsole --hold -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-no-audio %F
+Icon=audio-volume-muted
+Name=Delete audio (Telegram GIF)
+Name[it]=Elimina audio (Telegram GIF)
+
+[Desktop Action real-gif]
+Exec=konsole --hold -e "$HOME/.local/scripts/unix/convert-tools.sh" ffmpeg-gif %F
+Icon=image-gif
+Name=Convert to GIF
+Name[it]=Converti in GIF
+
+[Desktop Action conv-mp4]
+Exec=konsole --hold -e "$HOME/.local/scripts/unix/convert-tools.sh" mpv-any2mp4 %F
+Icon=gtk-convert
+Name=Convert to MP4
+Name[it]=Converti in MP4

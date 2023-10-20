@@ -1,0 +1,21 @@
+# 2022-12-02, Microeinstein
+
+[Desktop Entry]
+Type=Service
+# all/all  all/allfiles  */*  inode/directory  application/octet-stream
+MimeType=all/all;
+Actions=Shortcut;
+Encoding=UTF-8
+Icon=inode-symlink
+ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-StartupNotify=false
+#X-KDE-Priority=TopLevel
+#X-KDE-Submenu=Share
+#X-KDE-Submenu[it]=Condivisione
+
+[Desktop Action Shortcut]
+Icon=inode-symlink
+Name=Send to Desktop (create shortcut)
+Name[it]=Invia al Desktop (crea collegamento)
+#Exec=konsole --hold -e "$HOME/.local/bin/shortcut_creator.sh" %U
+Exec="$HOME/.local/scripts/unix/desktop/shortcut-creator.sh" %U

@@ -1,0 +1,24 @@
+# 2022-04-16, Microeinstein
+
+[Desktop Entry]
+Type=Service
+Actions=fmt1;fmt2
+Encoding=UTF-8
+Icon=edit-tag-symbolic
+MimeType=audio/mpeg;audio/ogg;audio/flac;audio/aac;audio/x-vorbis+ogg;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Rename from tags
+X-KDE-Submenu[it]=Rinomina da tags
+
+[Desktop Action fmt1]
+Exec=exiftool   '-filename<${artist;s|/|-|g} - ${title;s|/|-|g}.$filetypeextension'   %F  &&  notify-send -a "Service" -i "stock_dialog-info" "Rename from tags" "Done"  ||  notify-send -a "Service" -i "stock_dialog-warning" "Rename from tags" "Errors"
+Icon=edit-tag-symbolic
+Name=Artist - Title
+Name[it]=Artista - Titolo
+
+[Desktop Action fmt2]
+Exec=exiftool   '-filename<${track;s|/.*$||g;$_=sprintf("%02d",$_)}. ${artist;s|/|-|g} - ${title;s|/|-|g}.$filetypeextension'   '-filename<${tracknumber;s|/.*$||g;$_=sprintf("%02d",$_)}. ${artist;s|/|-|g} - ${title;s|/|-|g}.$filetypeextension'   %F  &&  notify-send -a "Service" -i "stock_dialog-info" "Rename from tags" "Done"  ||  notify-send -a "Service" -i "stock_dialog-warning" "Rename from tags" "Errors"
+Icon=edit-tag-symbolic
+Name=Track. Artist - Title
+Name[it]=Traccia. Artista - Titolo

@@ -1,0 +1,21 @@
+# 2023-07-28, Microeinstein
+
+[Desktop Entry]
+Type=Service
+# all/all  all/allfiles  */*  inode/directory  application/octet-stream
+MimeType=inode/directory;
+Actions=Open;
+Encoding=UTF-8
+Icon=show-sidebar
+ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-StartupNotify=false
+#X-KDE-Priority=TopLevel
+#X-KDE-Submenu=Share
+#X-KDE-Submenu[it]=Condivisione
+
+[Desktop Action Open]
+Icon=show-sidebar
+Name=Open from external storage
+Name[it]=Apri dallo storage esterno
+Exec="$HOME/.local/scripts/unix/desktop/dir-root-switch.sh" %U
+X-KDE-MaxNumberOfUrls=1

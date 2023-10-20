@@ -1,0 +1,24 @@
+# 2022-07-23, Microeinstein
+
+[Desktop Entry]
+Type=Service
+Actions=1_ffprobe;2_exiftool
+Encoding=UTF-8
+Icon=zoom
+MimeType=application/octet-stream;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Analyze with
+X-KDE-Submenu[it]=Analizza con
+
+[Desktop Action 1_ffprobe]
+Exec=konsole --hold -e bash -c 'for f in "$@"; do ffprobe -hide_banner -show_format -show_streams -of json "$f"; done'  dummy %F
+Icon=zoom
+Name=ffprobe
+#Name[it]=
+
+[Desktop Action 2_exiftool]
+Exec=konsole --hold -e exiftool -a -s -G %F
+Icon=zoom
+Name=exiftool
+#Name[it]=

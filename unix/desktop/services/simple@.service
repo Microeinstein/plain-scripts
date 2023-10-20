@@ -1,0 +1,8 @@
+[Unit]
+Description=%i
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/scripts/unix/desktop/services
+Environment=IS_DAEMON=1
+ExecStart=/bin/bash %i.sh

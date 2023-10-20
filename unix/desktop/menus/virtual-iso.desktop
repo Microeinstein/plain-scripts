@@ -1,0 +1,31 @@
+# Microeinstein
+
+[Desktop Entry]
+Type=Service
+Icon=media-eject-symbolic
+Actions=iso_cdemu_open;iso_open;iso_close;
+Encoding=UTF-8
+MimeType=application/x-cd-image;application/x-raw-disk-image;application/x-cue;application/x-mds;
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=ISO Image
+X-KDE-Submenu[it]=Immagine ISO
+
+[Desktop Action iso_open]
+Exec="$HOME/.local/scripts/unix/virtual-iso.sh" open %F
+Icon=media-mount-symbolic
+Name=Mount (udisksctl)
+Name[it]=Monta (udisksctl)
+
+[Desktop Action iso_close]
+Exec="$HOME/.local/scripts/unix/virtual-iso.sh" close %F
+Icon=media-eject-symbolic
+Name=Eject (losetup+udisksctl)
+Name[it]=Espelli (losetup+udisksctl)
+
+# requires cdemu-client and running cdemu-daemon
+[Desktop Action iso_cdemu_open]
+Exec=cdemu load any %F
+Icon=cd
+Name=Mount (cdemu)
+Name[it]=Monta (cdemu)

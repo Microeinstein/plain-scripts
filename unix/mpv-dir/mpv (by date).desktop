@@ -1,0 +1,18 @@
+[Desktop Entry]
+Comment[it_IT]=Lettore multimediale
+Comment=Lettore multimediale
+Exec="$HOME/.local/scripts/unix/mpv-dir/mpv-dir.sh" date %U
+GenericName[it_IT]=
+GenericName=
+Icon=mpv
+MimeType=video/x-theora+ogg;video/x-theora+ogg;video/x-ogm+ogg;video/x-ogm+ogg;video/x-msvideo;video/x-msvideo;video/x-msvideo;video/x-msvideo;video/x-msvideo;video/x-msvideo;video/x-ms-wmv;video/x-matroska;video/x-flv;video/x-flv;video/x-flic;video/x-flic;video/webm;video/vnd.rn-realvideo;video/vnd.mpegurl;video/quicktime;video/ogg;video/mpeg;video/mpeg;video/mp4;video/mp4;video/mp4;video/mp2t;video/dv;video/3gpp2;video/3gpp2;video/3gpp;video/3gpp;video/3gpp;inode/directory;audio/x-wavpack;audio/x-wav;audio/x-wav;audio/x-vorbis+ogg;audio/x-vorbis+ogg;audio/x-vorbis+ogg;audio/x-tta;audio/x-scpls;audio/x-scpls;audio/x-musepack;audio/x-ms-wma;audio/x-ms-asx;audio/x-mpegurl;audio/x-mpegurl;audio/x-mpegurl;audio/x-matroska;audio/x-ape;audio/x-aiff;audio/x-adpcm;audio/webm;audio/vnd.rn-realaudio;audio/vnd.rn-realaudio;audio/vnd.dts.hd;audio/vnd.dts;audio/ogg;audio/mpeg;audio/mpeg;audio/mpeg;audio/mpeg;audio/mp4;audio/mp4;audio/mp4;audio/mp2;audio/mp2;audio/flac;audio/AMR;audio/ac3;audio/aac;audio/aac;application/x-shorten;application/x-shorten;application/x-matroska;application/x-cue;application/vnd.rn-realmedia;application/vnd.rn-realmedia;application/vnd.ms-asf;application/vnd.ms-asf;application/vnd.apple.mpegurl;application/smil+xml;application/sdp;application/ogg;application/ogg;application/mxf;
+Name[it_IT]=mpv Media Player (by date)
+Name=mpv Media Player (by date)
+NoDisplay=false
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=
