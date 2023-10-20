@@ -1,5 +1,5 @@
 #!/bin/bash
-# 2023-07-10 - Microeinstein
+# 2023-08-07 - Microeinstein
 
 
 bind 'set show-all-if-ambiguous on'
@@ -65,6 +65,7 @@ setup_PS1() {
     local -A B=(
         [user]='\u'  [host]='\h'  [euid]='\$'  [path]='\w'  [cdir]='\W'  [cmdn]='\#'
     )
+    B[host]='$HOSTNAME'  # fix for Termux
     
     CSI() { printf '\e[%s' "$*"; }  # do not use in PS1
     FMT() {
@@ -86,22 +87,38 @@ setup_PS1() {
     # tweaks
     [[ ! -v TERM || "$TERM" == dummy ]]    && return  # terminal is too stupid
     
-    local rever=0  rgb=0  light=0  basic=0  short=0
+    local rever=0  rgb=0  light=0  basic=0  short=0  hostname=0
     
-    check_term() {
+    check_known_terms() {
         # sudo -> env vars will be cleared without -E option
-        local -n sudo=SUDO_UID  konsole=KONSOLE_VERSION  xterm=XTERM_VERSION  \
-                 vscode=TERM_PROGRAM  idea=TERMINAL_EMULATOR  kate=KATE_PID
+        local refs=(
+               sudo=SUDO_UID
+                ssh=SSH_CLIENT
+            android=ANDROID_DATA
+             termux=TERMUX_VERSION
+            konsole=KONSOLE_VERSION
+              xterm=XTERM_VERSION
+             vscode=TERM_PROGRAM
+               idea=TERMINAL_EMULATOR
+               kate=KATE_PID
+        )
+        local -n "${refs[@]}"
         
-        [[ "$TERM" != xterm* || -v xterm ]]    && basic=1
-        [[ -v xterm ]]                         && rever=1
-        [[ -v konsole || -v sudo ]]            && rgb=1
-        [[ -v xterm || -v vscode || -v idea ]] && rgb=0
+        [[ -v xterm ]]                       && rever=1
+        [[ "$TERM" != xterm* || -v xterm ]]  && basic=1
+        [[ -v ssh || -v termux ]]            && basic=1
+        [[ -v android && ! -v termux ]]      && hostname=1
+        [[ -v ssh ]]                         && hostname=1
+        [[ "$COLORTERM" == truecolor ]]      && rgb=1
+        # [[ -v konsole || -v sudo ]]             && rgb=1
+        # [[ -v xterm || -v vscode || -v idea ]]  && rgb=0
         [[ -v vscode || -v idea || -v kate ]]  && short=1
+        [[ -v termux ]]                        && short=1
+        [[ -v ssh ]]                           && short=0
         [[ -v vscode || -v idea ]]             && light=1
     }
-    check_term
-    unset -f check_term
+    check_known_terms
+    unset -f check_known_terms
     
     if ((rever)); then
         C[fdwhi]='30'
@@ -282,6 +299,7 @@ setup_PS1() {
     #   half_circle_thick 
     #   hard_divider      
     local ps1=("${excd}${anim}" '$(__MYEXIT) '  "$lcmd"  "$(FMT r)" )
+    local hh=()
     #ps1+=("${B[cmdn]} ")  # debug
     if ((basic)); then
         if ((short)); then
@@ -291,16 +309,20 @@ setup_PS1() {
                 "$(FMT nb)"            '>'
             )
         else
-            # user) workdir $>
+            # user@host) workdir $>
+            ((hostname)) && hh=(
+                "$(FMT r flbla)"     "•"
+                "$(FMT f flwhi)"     "${B[host]}"
+            )
             ps1+=(
-                "$(FMT b fc="$stil")"  "${B[user]}"
+                "$(FMT b fc="$stil")"  "${B[user]}"  "${hh[@]}"
                 "$(FMT r flwhi)"       ') $(__MYPWD) '
                 "$(FMT flusr)"         "${B[euid]}"
                 "$(FMT fdusr)"         '>'
             )
         fi
     elif ((short)); then
-        # (( workdir >>
+        # ( workdir >>
         ps1+=(
             "$(FMT fc="$gray"           )"  ''
             "$(FMT bc="$gray" fr        )"  ' $(__MYPWD) '
@@ -308,11 +330,19 @@ setup_PS1() {
             "$(FMT br         fc="$stil")"  ''
         )
     else
-        # (( user )) workdir >>
+        # ( user ) host ) workdir >>
+        local ppc=fc="$stil"  # prev part color
+        if ((hostname)); then
+            hh=(
+                "$(FMT "$ppc" blbla)"       ''
+                "$(FMT f fdbla)"              " ${B[host]}"
+            )
+            ppc=flbla
+        fi
         ps1+=(
             "$(FMT fc="$stil"           )"  ''
-            "$(FMT bc="$stil" fdbla     )"  "${B[user]}"
-            "$(FMT fc="$stil" bc="$gray")"  ''
+            "$(FMT bc="$stil" fdbla     )"  "${B[user]}"  "${hh[@]}"
+            "$(FMT r "$ppc"   bc="$gray")"  ''
             "$(FMT fr                   )"  ' $(__MYPWD) '
             "$(FMT bdusr      fc="$gray")"  ''
             "$(FMT fdusr      br        )"  ''
