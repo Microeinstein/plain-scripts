@@ -637,7 +637,7 @@ end
 
 --selezione interattiva
 if #arg < 1 or not exercise then
-    choices = path.getFiles(".",false)
+    choices = path.getFiles("exercises",false)
     --for k,v in pairs(choices) do print(k,v) end
     choices = table.compact(table.where(choices,
         function(k,v)
