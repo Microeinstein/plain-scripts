@@ -415,7 +415,7 @@ radio_chill() {
     dialogMenu "Select stream" 'play -'
 }
 radio_vapor_ff() {
-    addEntry "Yumi Co. Radio"             http://yumicoradio.net:8000/stream
+    addEntry "Yumi Co. Radio"             http://s1.yumicoradio.net:8000/stream
     addSeparator
     addEntry "Random VaporFunk Radio"     http://krelez.chris-the-tuner.de:15000/vaporradio_hqmp3
     addSeparator
